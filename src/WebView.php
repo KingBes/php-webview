@@ -188,7 +188,7 @@ class WebView
         if ($pharPath != "") {
             $dirPath = dirname($pharPath) . DIRECTORY_SEPARATOR . 'os' . DIRECTORY_SEPARATOR;
         } else {
-            $dirPath = dirname(dirname($this->baseDir)) . DIRECTORY_SEPARATOR . 'os' . DIRECTORY_SEPARATOR;
+            $dirPath = dirname($this->baseDir) . DIRECTORY_SEPARATOR . 'os' . DIRECTORY_SEPARATOR;
         }
         $this->libraryFile = match (PHP_OS_FAMILY) {
             'Linux'   => $dirPath . 'linux' . DIRECTORY_SEPARATOR . 'webview_php_ffi.so',
