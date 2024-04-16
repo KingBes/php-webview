@@ -32,7 +32,7 @@ class WebView
         protected string         $baseDir = __DIR__,
         protected ?string        $libraryFile = null,
     ) {
-        $headerContent = file_get_contents($this->baseDir . DIRECTORY_SEPARATOR . 'webview_php.h');
+        $headerContent = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'webview_php.h');
         $this->ffi = FFI::cdef($headerContent, $this->getDefaultLibraryFile());
         $this->webview = $this->ffi->webview_create((int)$this->debug, null);
     }
@@ -188,7 +188,7 @@ class WebView
         if ($pharPath != "") {
             $dirPath = dirname($pharPath) . DIRECTORY_SEPARATOR . 'os' . DIRECTORY_SEPARATOR;
         } else {
-            $dirPath = dirname(dirname(dirname($this->baseDir))) . DIRECTORY_SEPARATOR . 'os' . DIRECTORY_SEPARATOR;
+            $dirPath = dirname(dirname($this->baseDir)) . DIRECTORY_SEPARATOR . 'os' . DIRECTORY_SEPARATOR;
         }
         $this->libraryFile = match (PHP_OS_FAMILY) {
             'Linux'   => $dirPath . 'linux' . DIRECTORY_SEPARATOR . 'webview_php_ffi.so',
