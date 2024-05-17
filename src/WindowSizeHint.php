@@ -2,6 +2,12 @@
 
 namespace KingBes\PhpWebview;
 
+/**
+ * HINT_NONE 自由缩放
+ * HINT_MIN 固定最小
+ * HINT_MAX 固定最大
+ * HINT_FIXED 禁止缩放
+ */
 enum WindowSizeHint: int
 {
     case HINT_NONE = 0;
