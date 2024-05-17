@@ -12,14 +12,16 @@ class WebView
 
     private $webview;
 
+    protected WindowSizeHint $hint = WindowSizeHint::HINT_NONE;
+
     /**
      * @param string $title
      * @param int $width
      * @param int $height
-     * @param WindowSizeHint $hint
      * @param string $baseDir
      * @param string|null $libraryFile
      * @param bool $debug
+     * @param WindowSizeHint $hint
      * @throws OsException
      * @throws FFI\Exception
      */
@@ -27,14 +29,13 @@ class WebView
         protected string         $title,
         protected int            $width,
         protected int            $height,
-        protected WindowSizeHint $hint,
         protected bool           $debug = false,
         protected string         $baseDir = __DIR__,
         protected ?string        $libraryFile = null,
     ) {
         $headerContent = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'webview_php.h');
         $this->ffi = FFI::cdef($headerContent, $this->getDefaultLibraryFile());
-        $this->webview = $this->ffi->webview_create((int)$this->debug, null);
+        $this->webview = $this->ffi->webview_create((int)$this->debug, $this->width, $this->height, null);
     }
 
     public function getFFI(): FFI
@@ -153,10 +154,17 @@ class WebView
         return $this;
     }
 
+    public function size(int $width, int $height, WindowSizeHint $hint): self
+    {
+        $this->width = $width;
+        $this->height = $height;
+        $this->hint = $hint;
+        $this->ffi->webview_set_size($this->webview, $this->width, $this->height, $this->hint->value);
+    }
+
     public function run(): self
     {
         $this->ffi->webview_set_title($this->webview, $this->title);
-        $this->ffi->webview_set_size($this->webview, $this->width, $this->height, $this->hint->value);
         $this->ffi->webview_run($this->webview);
 
         return $this;

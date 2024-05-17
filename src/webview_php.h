@@ -31,7 +31,7 @@ typedef void *webview_t;
 // passed here. Returns null on failure. Creation can fail for various reasons
 // such as when required runtime dependencies are missing or when window creation
 // fails.
-webview_t webview_create(int debug, void *window);
+webview_t webview_create(int debug,int winWidth,int winHeight, void *window);
 
 // Destroys a webview and closes the native window.
 void webview_destroy(webview_t w);
