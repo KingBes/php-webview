@@ -3,6 +3,7 @@
 namespace KingBes\PhpWebview;
 
 use Closure;
+use Error;
 use FFI;
 use OsException;
 
@@ -15,12 +16,12 @@ class WebView
     protected WindowSizeHint $hint = WindowSizeHint::HINT_NONE;
 
     /**
-     * @param string $title
-     * @param int $width
-     * @param int $height
-     * @param string $baseDir
-     * @param string|null $libraryFile
-     * @param bool $debug
+     * @param string $title 标题
+     * @param int $width 宽度
+     * @param int $height 高度
+     * @param bool $debug debug
+     * @param string $baseDir 入口路径
+     * @param string|null $libraryFile 拓展文件路径
      * @param WindowSizeHint $hint
      * @throws OsException
      * @throws FFI\Exception
@@ -38,16 +39,31 @@ class WebView
         $this->webview = $this->ffi->webview_create((int)$this->debug, $this->width, $this->height, null);
     }
 
+    /**
+     * 获取ffi function
+     *
+     * @return FFI
+     */
     public function getFFI(): FFI
     {
         return $this->ffi;
     }
 
+    /**
+     * 获取webview function
+     *
+     * @return mixed
+     */
     public function getWebview(): mixed
     {
         return $this->webview;
     }
 
+    /**
+     * 获取标题 function
+     *
+     * @return string
+     */
     public function getTitle(): string
     {
         return $this->title;
@@ -162,6 +178,12 @@ class WebView
         $this->ffi->webview_set_size($this->webview, $this->width, $this->height, $this->hint->value);
     }
 
+    public function icon_title(string $title): self
+    {
+        $this->ffi->webview_notify_icon($this->webview, $title);
+        return $this;
+    }
+
     public function run(): self
     {
         $this->ffi->webview_set_title($this->webview, $this->title);
@@ -183,6 +205,54 @@ class WebView
 
         return $this;
     }
+
+    public function show_win(): self
+    {
+        $this->ffi->webview_show_win($this->webview);
+        return $this;
+    }
+
+    public function destroy_win(): self
+    {
+        $this->ffi->webview_destroy_win($this->webview);
+        return $this;
+    }
+
+    /**
+     * 任务栏图标菜单 function
+     *
+     * @param array $arr
+     * @return self
+     */
+    public function icon_menu(array $arr): self
+    {
+        if (!count($arr)) {
+            throw new \Exception("Cannot be an empty array");
+        }
+        $v = $this;
+        $this->ffi->webview_icon_menu($this->webview, function () use ($v, $arr) {
+            $hp = $v->ffi->webview_creat_icon_menu($v->webview);
+
+            foreach ($arr as $k => $val) {
+                if (isset($val["name"])) {
+                    $v->ffi->webview_icon_menu_text($v->webview, $hp, (int)$k, $val["name"]);
+                } else {
+                    throw new \Exception("There is no field name in key $k");
+                }
+            }
+
+            $num = $v->ffi->webview_track_icon_menu($v->webview, $hp);
+
+            if (isset($arr[$num]["fn"]) && is_callable($arr[$num]["fn"])) {
+                $arr[$num]["fn"]();
+            } else {
+                throw new \Exception("Field `fn` of key $num must be a function");
+            }
+            $v->ffi->webview_destory_icon_menu($v->webview, $hp);
+        });
+        return $this;
+    }
+
 
     /**
      * @throws OsException

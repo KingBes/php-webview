@@ -71,7 +71,7 @@ class Dialog
      * @param string $path 初始文件夹路径,比如：`D:/XXX`  =>D盘的xxx文件夹
      * @return boolean
      */
-    public function save(string $content, string $filename, string  $path = ""): bool
+    public function save(string $content, string $filename, string $path = ""): bool
     {
         return $this->ffi->save_file($content, $path, $filename);
     }
